@@ -36,9 +36,16 @@ Route::post('/contact-us-process', function () {
   $checks = implode(Input::get('checkbox'),",");
 
   Log::info('This is some useful information. '.$checks);
+  Log::info(env('MAIL_USERNAME',"").env('MAIL_NAME',""));
+
+  DB::table('contact_submissions')->insert(
+      ['name' => Input::get('name'), 'email' => Input::get('email'), 'services' => $checks, 'message' => Input::get('message')]
+  );
+
+
 
   Mail::send('emails.emailInquiry', ["theMessage"=>Input::get('message'),"checks"=>$checks], function($message){
-    $message->to(env('MAIL_USERNAME',""), env('MAIL_NAME'),"")->subject('Hooli Development Contact From '.Input::get('name'));
+    $message->to(env('MAIL_USERNAME',""), env('MAIL_NAME',""))->subject('Hooli Development Contact From '.Input::get('name'));
     $message->from(Input::get('email'), Input::get('name'));
   });
 
